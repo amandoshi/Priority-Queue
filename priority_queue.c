@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 // pQueue data structure
 typedef struct pQueue
@@ -15,53 +16,51 @@ pQueue QUEUE;
 
 // function declarations
 void enqueue(char* name, unsigned int priority);
-char* peek(void);
-void dequeue(void);
+bool dequeue(void);
+void traverse(void);
+bool queue_empty(void);
 
 int main(void)
 {
+	// list of names and priorities
 	char* names[5] = { "Aman", "Tom", "Pratyush", "Dawud", "Mr. Wood" };
 	unsigned int priorities[5] = { 2, 4, 3, 1, 0 };
 
+	// enqueue new names into priority queue
 	for (int i = 0; i < 5; i++)
 	{
 		enqueue(names[i], priorities[i]);
 	}
 
+	// print queue
 	printf("LIST\n");
-	pQueue* posPtr = &QUEUE;
-	for (int i = 0; i < 5; i++)
+	traverse();
+
+	// dequeue 2 nodes in queue
+	for (int i = 0; i < 2; i++)
 	{
-		printf("name: %s, priority: %i\n", posPtr->name, posPtr->priority);
-		if (posPtr->next != NULL)
-		{
-			posPtr = posPtr->next;
-		}
+		dequeue();
 	}
 
-	printf("\npeek: %s\n", peek());
-	dequeue();
-	printf("poped\n");
-
-
+	// print queue
 	printf("\nLIST\n");
-	posPtr = &QUEUE;
-	for (int i = 0; i < 4; i++)
+	traverse();
+
+	// dequeue all items in list - reject dequeues when empty
+	for (int i = 0; i < 7; i++)
 	{
-		printf("name: %s, priority: %i\n", posPtr->name, posPtr->priority);
-		if (posPtr->next != NULL)
-		{
-			posPtr = posPtr->next;
-		}
+		dequeue();
 	}
 
-	printf("\npeek: %s\n", peek());
+	// print queue
+	printf("\nLIST\n");
+	traverse();
 }
 
 void enqueue(char* name, unsigned int priority)
 {
 	// empty queue
-	if (strcmp(QUEUE.name, "") == false)
+	if (queue_empty())
 	{
 
 		strcpy_s(QUEUE.name, strlen(name) + 1, name);
@@ -136,29 +135,23 @@ void enqueue(char* name, unsigned int priority)
 			newPtr->next = posPtr->next;
 			posPtr->next = newPtr;
 		}
-
 	}
 }
 
-char* peek(void)
+bool dequeue(void)
 {
-	if (QUEUE.next != NULL)
+	if (queue_empty())
 	{
-		return QUEUE.next->name;
+		return false;
 	}
-	return NULL;
-}
-
-void dequeue(void)
-{
 	// if no QUEUE.next - delete current QUEUE.name
-	if (QUEUE.next == NULL)
+	else if (QUEUE.next == NULL)
 	{
 		strcpy_s(QUEUE.name, strlen("") + 1, "");
 	}
 	else
 	{
-		// delete node
+		//delete node
 		pQueue* tmpPtr = QUEUE.next;
 
 		strcpy_s(QUEUE.name, strlen(QUEUE.next->name)+1, QUEUE.next->name);
@@ -166,5 +159,29 @@ void dequeue(void)
 		QUEUE.next = QUEUE.next->next;
 
 		free(tmpPtr);
+	}
+	return true;
+}
+
+bool queue_empty(void)
+{
+	return strcmp(QUEUE.name, "") == false;
+}
+
+// print queue
+void traverse(void)
+{
+	pQueue* posPtr = &QUEUE;
+	while (true)
+	{
+		printf("name: %s, priority: %i\n", posPtr->name, posPtr->priority);
+		if (posPtr->next != NULL)
+		{
+			posPtr = posPtr->next;
+		}
+		else
+		{
+			break;
+		}
 	}
 }
